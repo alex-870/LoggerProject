@@ -17,8 +17,8 @@ with open(file_name) as file:
     gps_lat = []
     gps_long = []
     gps_alt = []
-    max_speed = 0
-    ind = 0
+    max_speed = [0]
+    max_index = 0
 
     for count, line in enumerate(data):
         if count > 1:
@@ -29,7 +29,12 @@ with open(file_name) as file:
             if line[1] != 'nan':
                 gps_lat.append(float(line[3]))
                 gps_long.append(float(line[4]))
-
+            if float(line[1]) > max_speed[0]:
+                max_speed[0] = float(line[1])
+                max_index = int(count)
+            
+# print(max_speed)
+# print(max_index)
 
 # creates plot for speed and altitude
 fig1 = make_subplots(specs=[[{"secondary_y": True}]])
@@ -42,6 +47,15 @@ fig1.add_trace(
 fig1.add_trace(
     go.Scatter(x=times, y=gps_alt, name="Altitude"),
     secondary_y=True,
+)
+
+fig1.add_trace(
+    go.Scatter(x=times[max_index-1:max_index], 
+               y=speeds[max_index-1:max_index], 
+               name="Max Speed",
+               text='Max Speed',
+               textposition='top center'),
+    secondary_y=False,
 )
 
 fig1.update_layout(title_text="Speed and Altitude")
