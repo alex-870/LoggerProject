@@ -1,12 +1,13 @@
 import csv
-import time
 import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 from datetime import datetime
 
+
 # change this to log file name
 file_name = 'Log-2023-11-20-19-36-40.csv'
+#file_name = input('Enter log file name: ')
 
 # opens csv file and creates lists for each column
 with open(file_name) as file:
@@ -16,6 +17,8 @@ with open(file_name) as file:
     gps_lat = []
     gps_long = []
     gps_alt = []
+    max_speed = 0
+    ind = 0
 
     for count, line in enumerate(data):
         if count > 1:
@@ -42,8 +45,7 @@ fig1.add_trace(
 )
 
 fig1.update_layout(title_text="Speed and Altitude")
-
-fig1.update_xaxes(title_text="xaxis title")
+fig1.update_xaxes(title_text="Time")
 fig1.update_yaxes(title_text="<b>Speed (mph)</b>", secondary_y=False)
 fig1.update_yaxes(title_text="<b>Altitude (ft)</b>", secondary_y=True)
 fig1.show()
@@ -51,7 +53,7 @@ fig1.show()
 
 # creates plot for location
 fig2 = px.scatter(x=gps_long,y=gps_lat)
-fig1.update_layout(title_text="Location")
+fig2.update_layout(title_text="Location")
 fig2.update_layout(xaxis_title="Longitude", yaxis_title="Latitude")
 fig2.show()
 
