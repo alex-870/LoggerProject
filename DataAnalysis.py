@@ -10,9 +10,6 @@ import pandas as pd
 file_name = 'Log-2023-11-20-19-36-40.csv'
 #file_name = input('Enter log file name: ')
 
-def setColor(a):
-    return 'red'
-
 # opens csv file and creates lists for each column
 with open(file_name) as file:
     data = csv.reader(file, delimiter=',')
