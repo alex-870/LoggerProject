@@ -7,7 +7,7 @@ import pandas as pd
 
 
 # change this to log file name
-file_name = 'Log-2023-11-20-19-36-40.csv'
+file_name = 'Wes_and_Chase_Log.csv'
 #file_name = input('Enter log file name: ')
 
 # opens csv file and creates lists for each column
@@ -21,6 +21,7 @@ with open(file_name) as file:
     max_speed = [0]
     max_index = 0
     speed2 = []
+    times2 = []
 
     for count, line in enumerate(data):
         if count > 1:
@@ -32,15 +33,34 @@ with open(file_name) as file:
                 gps_lat.append(float(line[3]))
                 gps_long.append(float(line[4]))
                 speed2.append(float(line[1]))
+                times2.append(date)
             if float(line[1]) > max_speed[0]:
                 max_speed[0] = float(line[1])
                 max_index = int(count)  
 
+# calculates 0 to 60 time
+zero_to_60 = (times2[-1] - times2[0]).total_seconds()
+print(f'Total Log Time: {round(zero_to_60,1)} sec')
+zeros_list = []
+sixties_list = []
 
-data_dict = {'Speed (mph)':speed2,
-             'gps_long':gps_long,
-             'gps_lat':gps_lat}
-df = pd.DataFrame(data_dict)
+for i, speed in enumerate(speed2):
+    if speed < 0.3:
+        zeros_list.append(i)
+    if speed >= 60:
+        sixties_list.append(i)
+
+for speed_0 in zeros_list:
+    for speed_60 in sixties_list:
+        time = (times2[speed_60] - times2[speed_0]).total_seconds()
+        if time>0:
+            if float(time) < float(zero_to_60):
+                zero_to_60 = time
+
+if zero_to_60 == (times2[-1] - times2[0]).total_seconds():
+    print('No 0 to 60 time set')
+else:
+    print(f'0 to 60 Time:  {round(zero_to_60,1)} sec') 
 
 # creates plot for speed and altitude
 fig1 = make_subplots(specs=[[{"secondary_y": True}]])
@@ -78,9 +98,19 @@ fig1.update_layout(legend=dict(
 ))
 fig1.show()
 
-# creates plot for location
-fig2 = px.scatter(df,x='gps_long',y='gps_lat',color='Speed (mph)')
+# pandas dataframe with speed and location
+data_dict = {'Speed (mph)':speed2,
+             'gps_long':gps_long,
+             'gps_lat':gps_lat}
+df = pd.DataFrame(data_dict)
+
+# creates plot for location and changes color based on speed
+fig2 = px.scatter(df,x='gps_long',y='gps_lat',
+                  color='Speed (mph)',
+                  color_continuous_scale='Turbo')
+
 fig2.update_layout(title_text="<b>Location</b>",
                    xaxis_title="<b>Longitude</b>",
                    yaxis_title="<b>Latitude</b>")
+
 fig2.show()
